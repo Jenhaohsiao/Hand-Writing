@@ -1,0 +1,5 @@
+{
+  "name": "Smart Hand writing Tutor",
+  "description": "A high-performance Chinese and English handwriting practice system featuring stroke order animation, interactive outlines, and intelligent feedback using the Gemini API for linguistic insights.",
+  "requestFramePermissions": []
+}
