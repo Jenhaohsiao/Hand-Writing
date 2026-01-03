@@ -23,16 +23,18 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 1, delay = 1000): Pr
   }
 }
 
-export const getCharacterInsights = async (char: string): Promise<CharacterInfo | null> => {
+export const getCharacterInsights = async (char: string, isSimplified: boolean = false): Promise<CharacterInfo | null> => {
   if (!process.env.API_KEY || !char) return null;
-  if (insightsCache[char]) return insightsCache[char];
+  const cacheKey = `${char}_${isSimplified ? 's' : 't'}`;
+  if (insightsCache[cacheKey]) return insightsCache[cacheKey];
 
   try {
+    const scriptType = isSimplified ? "Simplified Chinese" : "Traditional Chinese";
     const response = await withRetry(async () => {
       return await ai.models.generateContent({
         model: "gemini-3-flash-preview",
-        contents: `Provide linguistic information for the Traditional Chinese character: "${char}". 
-        Provide Pinyin, Zhuyin (Bopomofo), Radical, Stroke Count, and Meaning in Traditional Chinese.`,
+        contents: `Provide linguistic information for the Chinese character: "${char}". 
+        Provide Pinyin, Zhuyin (Bopomofo), Radical, Stroke Count, and Meaning in ${scriptType}.`,
         config: {
           responseMimeType: "application/json",
           responseSchema: {
@@ -56,7 +58,7 @@ export const getCharacterInsights = async (char: string): Promise<CharacterInfo 
     });
 
     const result = JSON.parse(response.text.trim()) as CharacterInfo;
-    insightsCache[char] = result; // 存入快取
+    insightsCache[cacheKey] = result; // 存入快取
     return result;
   } catch (error) {
     console.error("Gemini Insights Error:", error);
