@@ -71,7 +71,7 @@ export const generateSpeech = async (text: string): Promise<string | null> => {
   try {
     const response = await withRetry(async () => {
       return await ai.models.generateContent({
-        model: "gemini-2.5-flash-preview-tts",
+        model: "gemini-2.0-flash-exp", // 更新為支援 TTS 的正確模型名稱
         contents: [{ parts: [{ text: `請用標準國語讀出這個字：${text}` }] }],
         config: {
           responseModalities: [Modality.AUDIO],
